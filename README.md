@@ -1,0 +1,2 @@
+# CHESS_ROYALE
+نسخه ی وب CHESS_ROYALE مخصوص IOS
