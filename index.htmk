@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chess Royale — Midnight Games</title>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- PWA Meta Tags -->
+<meta name="application-name" content="Chess Royale">
+<meta name="description" content="Chess Royale — بازی شطرنج کلاسیک توسط Midnight Games">
+<meta name="theme-color" content="#D4AF37">
+<meta name="background-color" content="#08080E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chess Royale">
+<meta name="msapplication-TileColor" content="#08080E">
+<meta name="msapplication-TileImage" content="icons/icon-144.png">
+
+<!-- Icon -->
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/icon-512.png">
+<meta name="msapplication-TileImage" content="icons/icon-512.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;700;900&display=swap');
+
+:root {
+--gold:#D4AF37;--gold-l:#F5D060;--gold-d:#9A7D0A;
+--bg:#08080E;--surf:#111118;--surf2:#18181F;--surf3:#202028;
+--text:#F0EAD6;--text-dim:#7A7068;
+--lsq:#F0D9B5;--dsq:#B58863;
+--hi:rgba(212,175,55,0.55);--chk:rgba(192,57,43,0.8);
+--lm:rgba(170,160,40,0.3);--bdr:rgba(212,175,55,0.18);
+--purple:#8B5CF6;--green:#22C55E;--red:#EF4444;--blue:#3B82F6;
+}
+.light-mode {
+--bg:#F5F0E8;--surf:#FFFFFF;--surf2:#F0EBE0;--surf3:#E8E0D0;
+--text:#1A1208;--text-dim:#7A6A50;
+--bdr:rgba(154,125,10,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Vazirmatn','Inter','Noto Kufi Arabic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(212,175,55,0.06) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(139,92,246,0.05) 0%,transparent 55%);pointer-events:none;z-index:0;}
+.light-mode body::before{background:radial-gradient(ellipse at 15% 15%,rgba(212,175,55,0.08) 0%,transparent 55%);}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity 0.6s;}
+#splash.hidden{opacity:0;pointer-events:none;}
+.splash-icon{font-size:6rem;animation:splashPulse 1s ease-in-out infinite alternate;}
+.splash-title{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;}
+.splash-bar{width:200px;height:4px;background:var(--surf3);border-radius:2px;overflow:hidden;}
+.splash-fill{height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold));border-radius:2px;width:0%;transition:width 0.1s;}
+.splash-sub{font-size:0.75rem;color:var(--text-dim);letter-spacing:3px;}
+
+/* LANG & THEME now inside settings */
+.lang-toggle{display:flex;overflow:hidden;border-radius:10px;border:1px solid var(--bdr);}
+.lang-btn{padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;border:none;background:var(--surf2);color:var(--text-dim);font-family:inherit;transition:all 0.2s;}
+.lang-btn.active{background:var(--gold-d);color:var(--gold-l);}
+.theme-toggle{display:flex;overflow:hidden;border-radius:10px;border:1px solid var(--bdr);}
+.theme-tbtn{padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;border:none;background:var(--surf2);color:var(--text-dim);font-family:inherit;transition:all 0.2s;}
+.theme-tbtn.active{background:var(--surf3);color:var(--text);}
+
+/* SCREENS */
+.screen{display:none;position:relative;z-index:1;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* MENU */
+#menuScreen{flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;gap:1.6rem;}
+.branding{text-align:center;animation:fadeDown 0.7s ease;}
+.chess-king{font-size:5rem;filter:drop-shadow(0 0 35px rgba(212,175,55,0.7));animation:float 3.5s ease-in-out infinite;line-height:1;}
+.game-title{font-family:'Cinzel',serif;font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;margin-top:0.5rem;}
+.game-title-sub{font-size:0.85rem;color:var(--text-dim);margin-top:2px;font-family:'Cinzel',serif;letter-spacing:2px;}
+.studio-name{font-family:'Cinzel',serif;font-size:0.7rem;color:var(--text-dim);letter-spacing:3px;margin-top:5px;text-transform:uppercase;}
+.menu-card{background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:1.6rem 1.5rem;width:100%;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,0.4);animation:fadeUp 0.7s ease 0.15s both;}
+.sec-label{font-size:0.65rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.6rem;margin-top:0.9rem;padding-left:2px;}
+.sec-label:first-child{margin-top:0;}
+.mbtn{width:100%;padding:0.85rem 1.1rem;margin-bottom:0.55rem;border-radius:11px;border:none;cursor:pointer;font-family:inherit;font-size:0.95rem;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:0.7rem;}
+.mbtn:last-child{margin-bottom:0;}
+.mbtn-gold{background:linear-gradient(135deg,#B8860B,var(--gold));color:#0A0A0F;}
+.mbtn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(212,175,55,0.3);}
+.mbtn-sec{background:var(--surf2);color:var(--text);border:1px solid var(--bdr);}
+.mbtn-sec:hover{background:var(--surf3);transform:translateY(-2px);}
+.mbtn-purple{background:rgba(139,92,246,0.12);color:#A78BFA;border:1px solid rgba(139,92,246,0.22);}
+.mbtn-purple:hover{background:rgba(139,92,246,0.22);transform:translateY(-2px);}
+.mbtn-arrow{margin-right:auto;opacity:0.35;font-size:0.8rem;}
+
+/* GENERIC SCREEN */
+.gscreen{flex-direction:column;align-items:center;padding:1.5rem;gap:1.1rem;}
+.shdr{width:100%;max-width:430px;display:flex;align-items:center;gap:0.9rem;direction:ltr;}
+.back-btn{background:var(--surf2);border:1px solid var(--bdr);border-radius:9px;padding:6px 13px;color:var(--text);cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.2s;white-space:nowrap;}
+.back-btn:hover{background:var(--surf3);}
+.stitle{font-size:1.35rem;font-weight:700;color:var(--gold);}
+.panel{background:var(--surf);border:1px solid var(--bdr);border-radius:15px;padding:0.4rem 1.1rem;width:100%;max-width:430px;}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 0;border-bottom:1px solid rgba(128,100,50,0.1);}
+.prow:last-child{border-bottom:none;}
+.rlabel{font-size:0.92rem;}
+.rsub{font-size:0.7rem;color:var(--text-dim);margin-top:2px;}
+.toggle{position:relative;width:48px;height:25px;flex-shrink:0;}
+.toggle input{display:none;}
+.ttrack{position:absolute;inset:0;background:var(--surf3);border-radius:13px;cursor:pointer;transition:0.3s;}
+.ttrack::after{content:'';position:absolute;left:3px;top:3px;width:19px;height:19px;background:var(--text-dim);border-radius:50%;transition:0.3s;}
+.toggle input:checked+.ttrack{background:var(--gold-d);}
+.toggle input:checked+.ttrack::after{transform:translateX(23px);background:var(--gold);}
+.sctrl{background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;color:var(--text);padding:4px 9px;font-family:inherit;font-size:0.82rem;cursor:pointer;outline:none;}
+
+/* SKINS */
+#skinsScreen{flex-direction:column;align-items:center;padding:1.5rem;gap:1.1rem;}
+.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;width:100%;max-width:430px;}
+.skin-card{background:var(--surf);border:2px solid var(--bdr);border-radius:14px;padding:1rem;cursor:pointer;transition:all 0.2s;text-align:center;}
+.skin-card:hover{border-color:var(--gold-d);transform:translateY(-2px);}
+.skin-card.selected{border-color:var(--gold);box-shadow:0 0 16px rgba(212,175,55,0.3);}
+.skin-preview{display:flex;justify-content:center;gap:4px;font-size:2rem;margin-bottom:0.5rem;}
+.skin-name{font-size:0.82rem;font-weight:700;color:var(--text);}
+.skin-desc{font-size:0.68rem;color:var(--text-dim);margin-top:2px;}
+.skin-badge{display:inline-block;background:var(--gold-d);color:var(--gold-l);font-size:0.58rem;padding:2px 7px;border-radius:5px;margin-top:4px;font-weight:700;}
+
+/* ABOUT */
+.about-hero{text-align:center;padding:1.2rem;background:var(--surf);border:1px solid var(--bdr);border-radius:16px;width:100%;max-width:430px;}
+.ah-icon{font-size:3rem;margin-bottom:0.4rem;}
+.ah-title{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold);}
+.ah-sub{font-size:0.75rem;color:var(--text-dim);margin-top:3px;letter-spacing:2px;}
+.feature-list { text-align: right; direction: rtl; margin-top: 15px; }
+.feature-item { font-size: 0.8rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; border-bottom: 1px dashed var(--bdr); padding-bottom: 6px; }
+.feat-emoji { font-size: 1.1rem; min-width: 28px; }
+
+/* ACHIEVEMENTS */
+#achScreen{flex-direction:column;align-items:center;padding:1.5rem;gap:1.1rem;}
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;width:100%;max-width:430px;}
+.ach-card{background:var(--surf);border:1px solid var(--bdr);border-radius:13px;padding:0.9rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.3rem;position:relative;overflow:hidden;transition:all 0.2s;}
+.ach-card.done{border-color:var(--gold-d);}
+.ach-card.done::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,175,55,0.07),transparent);pointer-events:none;}
+.ach-card.locked{opacity:0.4;filter:grayscale(0.6);}
+.ach-ico{font-size:2rem;}
+.ach-nm{font-size:0.78rem;font-weight:700;}
+.ach-ds{font-size:0.65rem;color:var(--text-dim);}
+.ach-badge{position:absolute;top:5px;left:5px;background:var(--gold-d);color:var(--gold-l);font-size:0.55rem;padding:2px 5px;border-radius:5px;font-weight:700;}
+.ach-prog{width:100%;height:3px;background:var(--surf3);border-radius:2px;margin-top:3px;}
+.ach-prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.5s;}
+
+/* TOAST */
+.ach-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);background:linear-gradient(135deg,#1A1A10,#2A2510);border:1px solid var(--gold-d);border-radius:13px;padding:11px 18px;display:flex;align-items:center;gap:11px;z-index:1000;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 8px 30px rgba(0,0,0,0.5);min-width:250px;max-width:310px;}
+.ach-toast.show{transform:translateX(-50%) translateY(0);}
+.at-icon{font-size:1.9rem;}
+.at-lbl{font-size:0.6rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.at-name{font-size:0.9rem;font-weight:700;}
+.at-desc{font-size:0.7rem;color:var(--text-dim);}
+
+/* GAME */
+#gameScreen{flex-direction:column;align-items:center;padding:0.7rem;gap:0.6rem;padding-top:48px;}
+.game-hdr{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:0.4rem;}
+.pp{background:var(--surf);border:1px solid var(--bdr);border-radius:11px;padding:0.45rem 0.8rem;display:flex;align-items:center;gap:0.5rem;min-width:115px;transition:all 0.3s;}
+.pp.active{border-color:var(--gold);box-shadow:0 0 16px rgba(212,175,55,0.22);background:var(--surf2);}
+.p-avatar{font-size:1.4rem;}
+.p-name{font-size:0.78rem;font-weight:600;line-height:1.3;}
+.p-color{font-size:0.65rem;color:var(--text-dim);}
+.adot{width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 6px var(--gold);animation:pulse 1s infinite;display:none;margin-right:auto;}
+.pp.active .adot{display:block;}
+.cctr{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.back-sm{background:var(--surf2);border:1px solid var(--bdr);border-radius:7px;padding:4px 9px;color:var(--text);cursor:pointer;font-family:inherit;font-size:0.72rem;transition:all 0.2s;direction:ltr;}
+.back-sm:hover{background:var(--surf3);}
+.turn-badge{font-size:0.72rem;color:var(--text-dim);text-align:center;padding:3px 9px;background:var(--surf);border-radius:7px;border:1px solid var(--bdr);white-space:nowrap;}
+
+/* BOARD */
+#chessBoard{display:grid;grid-template-columns:repeat(8,1fr);border:3px solid var(--gold-d);border-radius:4px;box-shadow:0 0 50px rgba(212,175,55,0.12),0 20px 60px rgba(0,0,0,0.6);overflow:hidden;touch-action:none;}
+.sq{display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;user-select:none;transition:filter 0.1s;}
+.sq.light{background:var(--lsq);}
+.sq.dark{background:var(--dsq);}
+.sq.selected{background:var(--hi) !important;}
+.sq.vm::after{content:'';width:30%;height:30%;background:rgba(0,0,0,0.2);border-radius:50%;position:absolute;}
+.sq.vc::after{content:'';inset:4px;border:3px solid rgba(0,0,0,0.2);border-radius:3px;position:absolute;}
+.sq.lf,.sq.lt{background:var(--lm) !important;}
+.sq.ic{background:var(--chk) !important;}
+.piece{line-height:1;z-index:2;pointer-events:none;transition:transform 0.1s;}
+.sq:hover .piece{transform:scale(1.08);}
+.coord{position:absolute;font-weight:700;opacity:0.45;font-size:9px;}
+.coord.f{bottom:2px;right:3px;}
+.coord.r{top:2px;left:3px;}
+.sq.light .coord{color:var(--dsq);}
+.sq.dark .coord{color:var(--lsq);}
+
+/* CAPTURED */
+.cap-bar{display:flex;flex-wrap:wrap;gap:1px;font-size:1rem;min-height:22px;max-width:520px;width:100%;padding:0 3px;}
+
+/* HISTORY */
+.hist-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:9px;padding:5px 11px;width:100%;max-width:520px;max-height:65px;overflow-y:auto;}
+.hist-lbl{font-size:0.65rem;color:var(--text-dim);margin-bottom:3px;}
+.hist-list{display:flex;flex-wrap:wrap;gap:3px;}
+.mv-tag{background:var(--surf2);border-radius:4px;padding:2px 5px;font-size:0.7rem;font-family:monospace;}
+.mv-tag.w{color:#F0D9B5;}.mv-tag.b{color:#B58863;}
+
+/* CONTROLS */
+.gctrl{display:flex;gap:0.45rem;flex-wrap:wrap;justify-content:center;max-width:520px;width:100%;}
+.cbtn{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;color:var(--text);padding:5px 11px;cursor:pointer;font-family:inherit;font-size:0.77rem;transition:all 0.2s;display:flex;align-items:center;gap:4px;}
+.cbtn:hover{background:var(--surf3);transform:translateY(-1px);}
+
+/* MODALS */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.mo.active{display:flex;}
+.md{background:var(--surf);border:1px solid var(--bdr);border-radius:19px;padding:1.8rem 1.6rem;max-width:310px;width:90%;text-align:center;animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+.md-ico{font-size:3.2rem;margin-bottom:0.7rem;}
+.md-title{font-size:1.35rem;font-weight:700;color:var(--gold);margin-bottom:0.35rem;}
+.md-txt{color:var(--text-dim);margin-bottom:1.3rem;font-size:0.88rem;line-height:1.6;}
+.md-btns{display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;}
+.mdbtn{padding:0.6rem 1.2rem;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-size:0.88rem;font-weight:600;transition:all 0.2s;}
+.mdbtn-p{background:linear-gradient(135deg,#B8860B,var(--gold));color:#0A0A0F;}
+.mdbtn-p:hover{transform:translateY(-2px);}
+.mdbtn-s{background:var(--surf2);color:var(--text);border:1px solid var(--bdr);}
+.mdbtn-s:hover{background:var(--surf3);}
+.promo-row{display:flex;gap:0.6rem;justify-content:center;margin:0.9rem 0;}
+.promo-btn{background:var(--surf2);border:2px solid var(--bdr);border-radius:11px;padding:0.7rem;font-size:2.2rem;cursor:pointer;transition:all 0.2s;}
+.promo-btn:hover{border-color:var(--gold);transform:scale(1.1);}
+
+/* MYKET BUTTONS */
+.myket-btn{width:100%;padding:0.85rem 1.2rem;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:0.92rem;font-weight:700;display:flex;align-items:center;gap:0.8rem;transition:all 0.2s;margin-top:0.6rem;}
+.myket-btn-blue{background:linear-gradient(135deg,#1A5276,#2980B9);color:#fff;}
+.myket-btn-blue:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(41,128,185,0.4);}
+.myket-btn-green{background:linear-gradient(135deg,#1a7a3c,#27AE60);color:#fff;}
+.myket-btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(39,174,96,0.4);}
+.myket-btn-orange{background:linear-gradient(135deg,#a04000,#E67E22);color:#fff;}
+.myket-btn-orange:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(230,126,34,0.4);}
+.myket-btn-red{background:linear-gradient(135deg,#922b21,#E74C3C);color:#fff;}
+.myket-btn-red:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(231,76,60,0.4);}
+.myket-section-title{font-size:0.68rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;margin:1rem 0 0.5rem;padding:0 2px;width:100%;max-width:430px;}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+@keyframes splashPulse{from{filter:drop-shadow(0 0 20px rgba(212,175,55,0.4))}to{filter:drop-shadow(0 0 50px rgba(212,175,55,0.9))}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+<div class="splash-icon">♛</div>
+<div class="splash-title">CHESS ROYALE</div>
+<div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div>
+<div class="splash-sub">MIDNIGHT GAMES</div>
+</div>
+
+<!-- TOAST -->
+<div class="ach-toast" id="achToast">
+<div class="at-icon" id="atIcon">🏆</div>
+<div style="flex:1">
+<div class="at-lbl" id="atLbl">دستاورد!</div>
+<div class="at-name" id="atName"></div>
+<div class="at-desc" id="atDesc"></div>
+</div>
+</div>
+
+<!-- MENU -->
+<div id="menuScreen" class="screen active">
+<div class="branding">
+<div class="chess-king">♛</div>
+<div class="game-title">CHESS ROYALE</div>
+<div class="game-title-sub" id="menuSubtitle">شطرنج رویال</div>
+<div class="studio-name">Midnight Games · V1.0.0</div>
+</div>
+<div class="menu-card">
+<div class="sec-label" data-fa="بازی" data-en="PLAY" data-ar="العب">بازی</div>
+<button class="mbtn mbtn-gold" onclick="snd('menuStart');startGame('friend')">
+<span>👥</span><span data-fa="بازی با دوست" data-en="Play with Friend" data-ar="العب مع صديق">بازی با دوست</span><span class="mbtn-arrow">›</span>
+</button>
+<button class="mbtn mbtn-sec" onclick="snd('menuStart');startGame('ai')">
+<span>🤖</span><span data-fa="بازی با هوش مصنوعی" data-en="Play vs AI" data-ar="العب ضد الذكاء">بازی با هوش مصنوعی</span><span class="mbtn-arrow">›</span>
+</button>
+<div class="sec-label" data-fa="شخصی‌سازی" data-en="CUSTOMIZE" data-ar="تخصيص">شخصی‌سازی</div>
+<button class="mbtn mbtn-purple" onclick="snd('menuNav');showScreen('skinsScreen')">
+<span>🎨</span><span data-fa="اسکین‌ها و مهره‌ها" data-en="Skins & Pieces" data-ar="السمات والقطع">اسکین‌ها و مهره‌ها</span><span class="mbtn-arrow">›</span>
+</button>
+<div class="sec-label" data-fa="پیشرفت" data-en="PROGRESS" data-ar="التقدم">پیشرفت</div>
+<button class="mbtn mbtn-purple" onclick="snd('menuNav');showScreen('achScreen')">
+<span>🏆</span><span data-fa="دستاوردها" data-en="Achievements" data-ar="الإنجازات">دستاوردها</span><span class="mbtn-arrow">›</span>
+</button>
+<button class="mbtn mbtn-sec" onclick="snd('menuNav');showScreen('settingsScreen')">
+<span>⚙️</span><span data-fa="تنظیمات" data-en="Settings" data-ar="الإعدادات">تنظیمات</span><span class="mbtn-arrow">›</span>
+</button>
+<button class="mbtn mbtn-sec" onclick="snd('menuNav');showScreen('aboutScreen')">
+<span>ℹ️</span><span data-fa="درباره بازی" data-en="About" data-ar="حول اللعبة">درباره بازی</span><span class="mbtn-arrow">›</span>
+</button>
+</div>
+</div>
+
+<!-- SKINS -->
+<div id="skinsScreen" class="screen gscreen">
+<div class="shdr">
+<button class="back-btn" onclick="snd('menuBack');showScreen('menuScreen')">← <span data-fa="بازگشت" data-en="Back" data-ar="رجوع">بازگشت</span></button>
+<div class="stitle">🎨 <span data-fa="اسکین‌ها" data-en="Skins" data-ar="السمات">اسکین‌ها</span></div>
+</div>
+<div style="font-size:0.75rem;color:var(--text-dim);width:100%;max-width:430px;padding:0 2px" data-fa="مهره‌ها" data-en="Pieces" data-ar="القطع">مهره‌ها</div>
+<div class="skin-grid" id="skinGrid"></div>
+<div style="font-size:0.75rem;color:var(--text-dim);width:100%;max-width:430px;padding:0 2px;margin-top:0.5rem" data-fa="رنگ صفحه" data-en="Board Color" data-ar="لون اللوحة">رنگ صفحه</div>
+<div class="skin-grid" id="boardGrid"></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsScreen" class="screen gscreen">
+<div class="shdr">
+<button class="back-btn" onclick="snd('menuBack');showScreen('menuScreen')">← <span data-fa="بازگشت" data-en="Back" data-ar="رجوع">بازگشت</span></button>
+<div class="stitle">⚙️ <span data-fa="تنظیمات" data-en="Settings" data-ar="الإعدادات">تنظیمات</span></div>
+</div>
+<div class="panel">
+<div class="prow">
+<div><div class="rlabel" data-fa="زبان" data-en="Language" data-ar="اللغة">زبان</div></div>
+<div class="lang-toggle">
+<button class="lang-btn active" onclick="setLang('fa')" id="btnFa">فا</button>
+<button class="lang-btn" onclick="setLang('en')" id="btnEn">EN</button>
+<button class="lang-btn" onclick="setLang('ar')" id="btnAr">ع</button>
+</div>
+</div>
+<div class="prow">
+<div><div class="rlabel" data-fa="تم" data-en="Theme" data-ar="السمة">تم</div></div>
+<div class="theme-toggle">
+<button class="theme-tbtn active" onclick="setTheme('dark')" id="btnDark">🌙 <span data-fa="تاریک" data-en="Dark" data-ar="داكن">تاریک</span></button>
+<button class="theme-tbtn" onclick="setTheme('light')" id="btnLight">☀️ <span data-fa="روشن" data-en="Light" data-ar="فاتح">روشن</span></button>
+</div>
+</div>
+<div class="prow">
+<div><div class="rlabel" data-fa="صدا" data-en="Sound" data-ar="الصوت">صدا</div><div class="rsub" data-fa="صداهای بازی" data-en="Game sounds" data-ar="أصوات اللعبة">صداهای بازی</div></div>
+<label class="toggle"><input type="checkbox" id="soundToggle" checked onchange="S.sound=this.checked"><span class="ttrack"></span></label>
+</div>
+<div class="prow">
+<div><div class="rlabel" data-fa="نمایش حرکات" data-en="Show Hints" data-ar="إظهار التلميحات">نمایش حرکات</div></div>
+<label class="toggle"><input type="checkbox" id="hintsToggle" checked onchange="S.hints=this.checked"><span class="ttrack"></span></label>
+</div>
+<div class="prow">
+<div><div class="rlabel" data-fa="نمایش مختصات" data-en="Coordinates" data-ar="الإحداثيات">نمایش مختصات</div></div>
+<label class="toggle"><input type="checkbox" id="coordToggle" checked onchange="S.coords=this.checked;if(G)renderBoard()"><span class="ttrack"></span></label>
+</div>
+<div class="prow">
+<div><div class="rlabel" data-fa="سطح هوش مصنوعی" data-en="AI Level" data-ar="مستوى الذكاء">سطح هوش مصنوعی</div></div>
+<select class="sctrl" id="aiLevel" onchange="S.aiLevel=parseInt(this.value)">
+<option value="1" data-fa="آسان" data-en="Easy" data-ar="سهل">آسان</option>
+<option value="2" selected data-fa="متوسط" data-en="Medium" data-ar="متوسط">متوسط</option>
+<option value="3" data-fa="سخت" data-en="Hard" data-ar="صعب">سخت</option>
+</select>
+</div>
+<!-- SECRET BUTTON -->
+<div class="prow" style="cursor:pointer;" onclick="checkSecretCode()">
+<div><div class="rlabel" style="color:var(--gold);">🔒 <span data-fa="منوی مخفی" data-en="Secret Menu" data-ar="قائمة سرية">منوی مخفی</span></div></div>
+<div style="font-size:0.7rem;color:var(--text-dim);">***</div>
+</div>
+</div>
+</div>
+
+<!-- ABOUT (با ویژگی‌ها و لینک) -->
+<div id="aboutScreen" class="screen gscreen">
+<div class="shdr">
+<button class="back-btn" onclick="snd('menuBack');showScreen('menuScreen')">← <span data-fa="بازگشت" data-en="Back" data-ar="رجوع">بازگشت</span></button>
+<div class="stitle">ℹ️ <span data-fa="درباره" data-en="About" data-ar="حول">درباره</span></div>
+</div>
+<div class="about-hero">
+<div class="ah-icon">♛</div>
+<div class="ah-title">CHESS ROYALE</div>
+<div class="ah-sub">MIDNIGHT GAMES · V1.0.0</div>
+</div>
+<div class="panel">
+<div class="prow"><div class="rsub" data-fa="نام بازی" data-en="Game" data-ar="اللعبة">نام بازی</div><div style="font-weight:600">Chess Royale</div></div>
+<div class="prow"><div class="rsub" data-fa="نسخه" data-en="Version" data-ar="الإصدار">نسخه</div><div style="font-weight:600">1.0.0</div></div>
+<div class="prow"><div class="rsub" data-fa="توسعه‌دهنده" data-en="Developer" data-ar="المطور">توسعه‌دهنده</div><div style="font-weight:700;font-family:'Cinzel',serif;color:var(--gold)">🌙 Midnight Games</div></div>
+<div class="prow"><div class="rsub" data-fa="زبان‌ها" data-en="Languages" data-ar="اللغات">زبان‌ها</div><div style="font-weight:600">فارسی · English · عربی</div></div>
+</div>
+<div class="panel" style="margin-top: 8px;">
+<div class="prow" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+<div style="width: 100%;">
+<div class="rlabel" style="text-align: center; margin-bottom: 8px;" data-fa="✨ ویژگی‌های بازی" data-en="✨ Game Features" data-ar="✨ مميزات اللعبة">✨ ویژگی‌های بازی</div>
+<div class="feature-list">
+<div class="feature-item"><span class="feat-emoji">🧠</span> <span data-fa="هوش مصنوعی در ۳ سطح (آسان، متوسط، سخت)" data-en="AI with 3 difficulty levels (Easy, Medium, Hard)" data-ar="ذكاء اصطناعي بثلاثة مستويات (سهل، متوسط، صعب)">هوش مصنوعی در ۳ سطح (آسان، متوسط، سخت)</span></div>
+<div class="feature-item"><span class="feat-emoji">👥</span> <span data-fa="حالت دو نفره Hotseat" data-en="2-Player Hotseat Mode" data-ar="وضعية لاعبين محليين">حالت دو نفره Hotseat</span></div>
+<div class="feature-item"><span class="feat-emoji">🎨</span> <span data-fa="۱۰+ اسکین مختلف برای مهره‌ها (طبیعت، فضا، فانتزی و...)" data-en="10+ Unique Piece Skins (Nature, Space, Fantasy, etc.)" data-ar="أكثر من 10 سمات للقطع (طبيعة، فضاء، خيال)">۱۰+ اسکین مختلف برای مهره‌ها (طبیعت، فضا، فانتزی و...)</span></div>
+<div class="feature-item"><span class="feat-emoji">🌈</span> <span data-fa="۱۲ تم رنگی منحصربه‌فرد برای صفحه" data-en="12 Unique Board Color Themes" data-ar="12 لوناً فريداً للوحة">۱۲ تم رنگی منحصربه‌فرد برای صفحه</span></div>
+<div class="feature-item"><span class="feat-emoji">🏆</span> <span data-fa="سیستم پیشرفته دستاوردها با بیش از ۲۰ جایزه" data-en="Advanced Achievement System with over 20 Trophies" data-ar="نظام إنجازات متقدم مع أكثر من 20 جائزة">سیستم پیشرفته دستاوردها با بیش از ۲۰ جایزه</span></div>
+<div class="feature-item"><span class="feat-emoji">⚡</span> <span data-fa="حرکت‌های ویژه شطرنج (قلعه، آنپاسان، ترفیع)" data-en="Special Chess Moves (Castling, En Passant, Promotion)" data-ar="حركات خاصة (التبييت، المرور، الترقية)">حرکت‌های ویژه شطرنج (قلعه، آنپاسان، ترفیع)</span></div>
+<div class="feature-item"><span class="feat-emoji">💾</span> <span data-fa="ذخیره‌سازی خودکار پیشرفت و دستاوردها" data-en="Automatic Progress & Achievement Saving" data-ar="حفظ تلقائي للتقدم والإنجازات">ذخیره‌سازی خودکار پیشرفت و دستاوردها</span></div>
+<div class="feature-item"><span class="feat-emoji">📱</span> <span data-fa="قابلیت نصب روی دستگاه (PWA)" data-en="Installable on Device (PWA)" data-ar="قابل للتثبيت (PWA)">قابلیت نصب روی دستگاه (PWA)</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- دکمه جدید برای کانال تلگرام/بله -->
+<button class="mbtn mbtn-sec" style="margin-top: 8px; justify-content: center;" onclick="window.open('https://ble.ir/Midnight_Games', '_blank')">
+<span>📢</span> <span data-fa="عضویت در کانال Midnight Games" data-en="Join Midnight Games Channel" data-ar="انضم إلى قناة Midnight Games">عضویت در کانال Midnight Games</span>
+</button>
+</div>
+
+<!-- ACHIEVEMENTS -->
+<div id="achScreen" class="screen">
+<div class="gscreen" style="width:100%">
+<div class="shdr">
+<button class="back-btn" onclick="snd('menuBack');showScreen('menuScreen')">← <span data-fa="بازگشت" data-en="Back" data-ar="رجوع">بازگشت</span></button>
+<div class="stitle">🏆 <span data-fa="دستاوردها" data-en="Achievements" data-ar="الإنجازات">دستاوردها</span></div>
+</div>
+<div class="ach-grid" id="achGrid"></div>
+</div>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen" class="screen">
+<div class="game-hdr">
+<div class="pp" id="blackP">
+<div class="p-avatar" id="blackAvatar">♟</div>
+<div>
+<div class="p-name" id="blackName">P2</div>
+<div class="p-color" id="blackColorLabel">مشکی</div>
+</div>
+<div class="adot"></div>
+</div>
+<div class="cctr">
+<button class="back-sm" onclick="confirmExit()">← <span data-fa="منو" data-en="Menu" data-ar="القائمة">منو</span></button>
+<div class="turn-badge" id="turnBadge">—</div>
+</div>
+<div class="pp" id="whiteP" style="flex-direction:row-reverse">
+<div class="p-avatar" id="whiteAvatar">♙</div>
+<div style="text-align:right">
+<div class="p-name" id="whiteName">P1</div>
+<div class="p-color" id="whiteColorLabel">سفید</div>
+</div>
+<div class="adot"></div>
+</div>
+</div>
+<div class="cap-bar" id="capW" style="justify-content:flex-end"></div>
+<div id="chessBoard"></div>
+<div class="cap-bar" id="capB"></div>
+<div class="hist-wrap">
+<div class="hist-lbl" data-fa="تاریخچه" data-en="History" data-ar="التاريخ">تاریخچه</div>
+<div class="hist-list" id="mvList"></div>
+</div>
+<div class="gctrl">
+<button class="cbtn" onclick="undoMove()">↩ <span data-fa="برگشت" data-en="Undo" data-ar="تراجع">برگشت</span></button>
+<button class="cbtn" onclick="offerDraw()">🤝 <span data-fa="تساوی" data-en="Draw" data-ar="تعادل">تساوی</span></button>
+<button class="cbtn" onclick="resignGame()">🏳 <span data-fa="تسلیم" data-en="Resign" data-ar="استسلام">تسلیم</span></button>
+<button class="cbtn" onclick="newGameConfirm()">🔄 <span data-fa="جدید" data-en="New" data-ar="جديد">جدید</span></button>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="mo" id="gameOverMo">
+<div class="md">
+<div class="md-ico" id="goIco">🏆</div>
+<div class="md-title" id="goTitle"></div>
+<div class="md-txt" id="goTxt"></div>
+<div class="md-btns">
+<button class="mdbtn mdbtn-p" onclick="restartGame()" data-fa="دوباره" data-en="Again" data-ar="مجدداً">دوباره</button>
+<button class="mdbtn mdbtn-s" onclick="goToMenu()" data-fa="منو" data-en="Menu" data-ar="القائمة">منو</button>
+</div>
+</div>
+</div>
+<div class="mo" id="promoMo">
+<div class="md">
+<div class="md-ico">👑</div>
+<div class="md-title" data-fa="ارتقاء پیاده" data-en="Promotion" data-ar="ترقية">ارتقاء پیاده</div>
+<div class="md-txt" data-fa="یک مهره انتخاب کن:" data-en="Choose a piece:" data-ar="اختر قطعة:">یک مهره انتخاب کن:</div>
+<div class="promo-row" id="promoRow"></div>
+</div>
+</div>
+<div class="mo" id="confirmMo">
+<div class="md">
+<div class="md-ico" id="cfIco">❓</div>
+<div class="md-title" id="cfTitle"></div>
+<div class="md-txt" id="cfTxt"></div>
+<div class="md-btns">
+<button class="mdbtn mdbtn-p" id="cfYes"></button>
+<button class="mdbtn mdbtn-s" onclick="closeMo('confirmMo')" data-fa="نه" data-en="No" data-ar="لا">نه</button>
+</div>
+</div>
+</div>
+<div class="mo" id="secretCodeMo">
+<div class="md">
+<div class="md-ico">🔐</div>
+<div class="md-title" data-fa="کد مخفی" data-en="Secret Code" data-ar="الرمز السري">کد مخفی</div>
+<div class="md-txt" data-fa="لطفا کد را وارد کنید:" data-en="Please enter the code:" data-ar="الرجاء إدخال الرمز:">لطفا کد را وارد کنید:</div>
+<input type="text" id="secretInput" placeholder="******" style="background: var(--surf2); border: 1px solid var(--bdr); color: var(--text); padding: 8px 12px; border-radius: 8px; width: 80%; margin-bottom: 15px; text-align: center; font-family: monospace;">
+<div class="md-btns">
+<button class="mdbtn mdbtn-p" onclick="verifySecretCode()" data-fa="تأیید" data-en="Confirm" data-ar="تأكيد">تأیید</button>
+<button class="mdbtn mdbtn-s" onclick="closeMo('secretCodeMo')" data-fa="انصراف" data-en="Cancel" data-ar="إلغاء">انصراف</button>
+</div>
+</div>
+</div>
+
+<script>
+// ============================================================
+// SECRET UNLOCKABLES
+// ============================================================
+const SECRET_SKIN = {
+id:'midnight',
+name:{fa:'نیمه‌شب',en:'Midnight',ar:'منتصف الليل'},
+desc:{fa:'هاله‌ای از رمز و راز',en:'Aura of mystery',ar:'هالة من الغموض'},
+w:['🌙','🏰','🐺','🦇','🔮','👑'],
+b:['✨','⚰️','🐉','🕸️','💀','🌑'],
+wStyle:'color:#E0E0FF; text-shadow: 0 0 3px #A78BFA;',
+bStyle:'color:#1A0033; text-shadow: 0 0 2px #C084FC;',
+badge:'🔮'
+};
+
+const SECRET_BOARD = {
+id:'midnight_theme', name:{fa:'نیمه‌شب (ویژه)',en:'Midnight (Special)',ar:'منتصف الليل (خاص)'}, l:'#0F1026', d:'#2A1B3D'
+};
+
+let secretUnlocked = false;
+
+function unlockSecretContent() {
+if(secretUnlocked) return;
+secretUnlocked = true;
+// Add to arrays if not already present
+if(!SKINS.find(s => s.id === 'midnight')) SKINS.push(SECRET_SKIN);
+if(!BOARD_THEMES.find(b => b.id === 'midnight_theme')) BOARD_THEMES.push(SECRET_BOARD);
+localStorage.setItem('cr_secret_unlocked', 'true');
+snd('ach');
+alert({fa:'راز باستانی گشوده شد! اسکین و تم جدید اضافه شد.', en:'Ancient secret unlocked! New skin and theme added!', ar:'تم فتح السر القديم! تمت إضافة سمة ولون جديد!'}[lang]);
+renderSkinGrid();
+}
+
+function checkSecretCode() {
+document.getElementById('secretInput').value = '';
+document.getElementById('secretCodeMo').classList.add('active');
+}
+
+function verifySecretCode() {
+let code = document.getElementById('secretInput').value;
+if(code === "Midnight") {
+unlockSecretContent();
+closeMo('secretCodeMo');
+} else {
+snd('bad');
+alert({fa:'کد اشتباه است!', en:'Wrong code!', ar:'رمز خاطئ!'}[lang]);
+closeMo('secretCodeMo');
+}
+}
+
+// ============================================================
+// SKINS SYSTEM
+// ============================================================
+// SKINS: order = [پیاده P, رخ R, اسب N, فیل B, وزیر Q, شاه K]
+const SKINS = [
+{ id:'classic',
+name:{fa:'کلاسیک',en:'Classic',ar:'كلاسيكي'},
+desc:{fa:'مهره‌های سنتی شطرنج',en:'Traditional chess pieces',ar:'قطع الشطرنج التقليدية'},
+w:['♙','♖','♘','♗','♕','♔'],
+b:['♟','♜','♞','♝','♛','♚'],
+wStyle:'color:#FFFFF0; text-shadow: 0 1px 4px #333, 0 0 2px #555;',
+bStyle:'color:#1A1A1A; text-shadow: 0 1px 4px rgba(255,255,255,0.4);',
+badge:null },
+
+{ id:'nature',
+name:{fa:'طبیعت',en:'Nature',ar:'الطبيعة'},
+desc:{fa:'حیوانات جنگل',en:'Forest animals',ar:'حيوانات الغابة'},
+w:['🌸','🌲','🐴','🐘','🦋','🦁'],
+b:['🌺','🌳','🦌','🐗','🦚','🐯'],
+badge:null },
+
+{ id:'space',
+name:{fa:'فضا',en:'Space',ar:'الفضاء'},
+desc:{fa:'تم کهکشانی',en:'Galaxy theme',ar:'موضوع المجرة'},
+w:['⭐','🚀','👨‍🚀','🪐','🌙','☀️'],
+b:['💫','🛸','👾','🌑','☄️','🌟'],
+badge:'جدید' },
+
+{ id:'medieval',
+name:{fa:'قرون وسطی',en:'Medieval',ar:'العصور الوسطى'},
+desc:{fa:'شوالیه‌ها و قلعه‌ها',en:'Knights & castles',ar:'الفرسان والقلاع'},
+w:['🪖','🏰','🐎','🛡️','👑','⚔️'],
+b:['⚙️','🏯','🗡️','🔱','💀','🧲'],
+badge:null },
+
+{ id:'ocean',
+name:{fa:'اقیانوس',en:'Ocean',ar:'المحيط'},
+desc:{fa:'دنیای زیر آب',en:'Underwater world',ar:'عالم تحت الماء'},
+w:['🐟','🦀','🐠','🐙','🐬','🦈'],
+b:['🐡','🦞','🦑','🪸','🐳','🐊'],
+badge:null },
+
+{ id:'royal',
+name:{fa:'رویال',en:'Royal',ar:'ملكي'},
+desc:{fa:'سبک شاهانه لاکچری',en:'Luxury royal style',ar:'الأسلوب الملكي الفاخر'},
+w:['💎','🗼','🦄','💍','👸','🤴'],
+b:['🖤','🏛️','🐉','🔮','🧙‍♀️','🧙'],
+badge:'👑' },
+
+{ id:'food',
+name:{fa:'غذا',en:'Food',ar:'الطعام'},
+desc:{fa:'مهره‌های خوردنی!',en:'Yummy pieces!',ar:'قطع لذيذة!'},
+w:['🍕','🎂','🍩','🥑','🍰','🍔'],
+b:['🌮','🍣','🍫','🍱','🍜','🍛'],
+badge:'🍕' },
+
+{ id:'halloween',
+name:{fa:'هالووین',en:'Halloween',ar:'هالوين'},
+desc:{fa:'ترسناک و بامزه',en:'Spooky & fun',ar:'مخيف وممتع'},
+w:['💀','⚰️','🐺','🎃','🧙‍♀️','😈'],
+b:['👻','🪦','🦇','🕷️','🧛','☠️'],
+badge:'🎃' },
+
+{ id:'sports',
+name:{fa:'ورزشی',en:'Sports',ar:'رياضي'},
+desc:{fa:'المپیک روی صفحه',en:'Olympics on board',ar:'الأولمبياد على اللوحة'},
+w:['🏃','🏟️','🏇','🤼','🥊','🏆'],
+b:['⚽','🎽','🏊','🎯','🥋','🔥'],
+badge:null },
+
+{ id:'mythical',
+name:{fa:'اساطیری',en:'Mythical',ar:'أسطوري'},
+desc:{fa:'موجودات افسانه‌ای',en:'Legendary creatures',ar:'مخلوقات أسطورية'},
+w:['🧚','🏰','🦄','🐲','🦅','🔱'],
+b:['🧞','🌋','🐉','👁️','🦋','⚡'],
+badge:'✨' },
+
+{ id:'tech',
+name:{fa:'تکنولوژی',en:'Tech',ar:'تقنية'},
+desc:{fa:'دنیای دیجیتال',en:'Digital world',ar:'العالم الرقمي'},
+w:['💻','🖥️','🤖','📱','🛰️','⚙️'],
+b:['🎮','🕹️','👾','💾','🔌','🧬'],
+badge:'🤖' },
+];
+
+const BOARD_THEMES = [
+{ id:'classic', name:{fa:'کلاسیک',en:'Classic',ar:'كلاسيك'}, l:'#F0D9B5', d:'#B58863' },
+{ id:'green', name:{fa:'سبز چمنی',en:'Grass Green',ar:'أخضر'}, l:'#FFFFDD', d:'#86A666' },
+{ id:'blue', name:{fa:'آبی اقیانوس',en:'Ocean Blue',ar:'أزرق'}, l:'#DEE3E6', d:'#788A94' },
+{ id:'purple', name:{fa:'بنفش شاهانه',en:'Royal Purple',ar:'بنفسجي'},l:'#E8D5F0', d:'#9B59B6' },
+{ id:'dark', name:{fa:'تاریک',en:'Dark',ar:'داكن'}, l:'#4A4A5A', d:'#2A2A3A' },
+{ id:'red', name:{fa:'قرمز',en:'Red',ar:'أحمر'}, l:'#F5D5D5', d:'#C0392B' },
+{ id:'midnight', name:{fa:'نیمه‌شب',en:'Midnight',ar:'منتصف الليل'}, l:'#1a1a2e', d:'#0f0f1a' },
+{ id:'forest', name:{fa:'جنگل',en:'Forest',ar:'غابة'}, l:'#C8E6C9', d:'#388E3C' },
+{ id:'sunset', name:{fa:'غروب',en:'Sunset',ar:'غروب الشمس'}, l:'#FFE0B2', d:'#E65100' },
+{ id:'ice', name:{fa:'یخ',en:'Ice',ar:'جليد'}, l:'#E3F2FD', d:'#5B9BD5' },
+{ id:'gold', name:{fa:'طلایی',en:'Golden',ar:'ذهبي'}, l:'#FFF9E6', d:'#D4AF37' },
+{ id:'rose', name:{fa:'گل‌سرخ',en:'Rose',ar:'وردي'}, l:'#FCE4EC', d:'#C2185B' },
+];
+
+let currentSkin = SKINS[0];
+let currentBoard = BOARD_THEMES[0];
+
+function renderSkinGrid() {
+const sg = document.getElementById('skinGrid');
+const bg = document.getElementById('boardGrid');
+sg.innerHTML = '';
+bg.innerHTML = '';
+
+SKINS.forEach(sk => {
+const card = document.createElement('div');
+card.className = 'skin-card' + (currentSkin.id === sk.id ? ' selected' : '');
+const prevW = sk.w[4]; const prevB = sk.b[4];
+const wStyle = sk.wStyle || ''; const bStyle = sk.bStyle || '';
+card.innerHTML = `<div class="skin-preview"> <span style="${wStyle}">${prevW}</span> <span style="${bStyle}">${prevB}</span> </div> <div class="skin-name">${sk.name[lang]}</div>
+<div class="skin-desc">${sk.desc[lang]}</div> ${sk.badge ? `<span class="skin-badge">${sk.badge}</span>` : ''}`;
+card.onclick = () => {
+currentSkin = sk;
+let triedSkins = JSON.parse(localStorage.getItem('cr_skins')||'[]');
+if(!triedSkins.includes(sk.id)){ triedSkins.push(sk.id); localStorage.setItem('cr_skins',JSON.stringify(triedSkins)); }
+unlockAch('skin_all', triedSkins.length);
+unlockAch('skin_change');
+renderSkinGrid();
+if (G) renderBoard();
+};
+sg.appendChild(card);
+});
+
+BOARD_THEMES.forEach(bt => {
+const card = document.createElement('div');
+card.className = 'skin-card' + (currentBoard.id === bt.id ? ' selected' : '');
+card.innerHTML = `<div class="skin-preview" style="gap:2px"> <div style="width:28px;height:28px;background:${bt.l};border-radius:4px;border:1px solid rgba(0,0,0,0.1)"></div>
+<div style="width:28px;height:28px;background:${bt.d};border-radius:4px"></div> </div> <div class="skin-name">${bt.name[lang]}</div>`;
+card.onclick = () => {
+currentBoard = bt;
+let triedBoards = JSON.parse(localStorage.getItem('cr_boards')||'[]');
+if(!triedBoards.includes(bt.id)){ triedBoards.push(bt.id); localStorage.setItem('cr_boards',JSON.stringify(triedBoards)); }
+unlockAch('board_all', triedBoards.length);
+document.documentElement.style.setProperty('--lsq', bt.l);
+document.documentElement.style.setProperty('--dsq', bt.d);
+renderSkinGrid();
+if (G) renderBoard();
+};
+bg.appendChild(card);
+});
+}
+
+// ============================================================
+// LANGUAGE
+// ============================================================
+let lang = 'fa';
+const STRINGS = {
+fa: { white:'سفید', black:'مشکی', turn:'نوبت ', check:'کیش! نوبت ', checkmate:'کیش‌ومات!',
+stalemate:'پات!', history:'تاریخچه', achUnlock:'🏆 دستاورد جدید!',
+winsMsg:' برنده شد!', resigned:' تسلیم شد', timeup:'وقت تموم شد!', draws:'بازی مساوی شد.' },
+en: { white:'White', black:'Black', turn:'Turn: ', check:'Check! ', checkmate:'Checkmate!',
+stalemate:'Stalemate!', history:'History', achUnlock:'🏆 Achievement Unlocked!',
+winsMsg:' wins!', resigned:' resigned', timeup:"Time's Up!", draws:'Draw.' },
+ar: { white:'أبيض', black:'أسود', turn:'دور: ', check:'كش! ', checkmate:'كش مات!',
+stalemate:'تعادل!', history:'التاريخ', achUnlock:'🏆 إنجاز جديد!',
+winsMsg:' فاز!', resigned:' استسلم', timeup:'انتهى الوقت!', draws:'تعادل.' },
+};
+const DIR = { fa:'rtl', en:'ltr', ar:'rtl' };
+
+function setLang(l) {
+lang = l;
+['btnFa','btnEn','btnAr'].forEach(id => document.getElementById(id).classList.remove('active'));
+document.getElementById(l==='fa'?'btnFa':l==='en'?'btnEn':'btnAr').classList.add('active');
+document.documentElement.lang = l;
+document.documentElement.dir = DIR[l];
+document.querySelectorAll('[data-fa]').forEach(el => {
+const v = el.dataset[l] || el.dataset.fa;
+if (el.tagName==='OPTION') el.textContent = v;
+else el.textContent = v;
+});
+updateMenuSubtitle();
+if (document.getElementById('skinsScreen').classList.contains('active')) renderSkinGrid();
+if (document.getElementById('achScreen').classList.contains('active')) renderAchGrid();
+if (G) updateGameUI();
+document.querySelectorAll('.mdbtn[data-fa]').forEach(b => b.textContent = b.dataset[l]||b.dataset.fa);
+if (l === 'ar') unlockAch('ar_lang');
+}
+
+function updateMenuSubtitle() {
+const subs = { fa:'شطرنج رویال', en:'Chess Royale', ar:'شطرنج رويال' };
+document.getElementById('menuSubtitle').textContent = subs[lang];
+}
+
+function t(key) { return (STRINGS[lang]||STRINGS.fa)[key] || key; }
+
+// ============================================================
+// THEME
+// ============================================================
+let darkMode = true;
+function setTheme(mode) {
+darkMode = mode === 'dark';
+document.body.classList.toggle('light-mode', !darkMode);
+document.documentElement.classList.toggle('light-mode', !darkMode);
+document.getElementById('btnDark').classList.toggle('active', darkMode);
+document.getElementById('btnLight').classList.toggle('active', !darkMode);
+requestAnimationFrame(() => {
+document.documentElement.style.setProperty('--lsq', currentBoard.l);
+document.documentElement.style.setProperty('--dsq', currentBoard.d);
+});
+}
+function toggleTheme() { setTheme(darkMode ? 'light' : 'dark'); }
+
+// ============================================================
+// AUDIO
+// ============================================================
+let actx;
+function ga(){ if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)(); return actx; }
+function snd(type){
+if(!S.sound) return;
+try{
+const c=ga(),o=c.createOscillator(),g=c.createGain();
+o.connect(g);g.connect(c.destination);const n=c.currentTime;
+if(type==='move'){o.frequency.setValueAtTime(600,n);o.frequency.exponentialRampToValueAtTime(400,n+0.1);g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.15);o.start(n);o.stop(n+0.15);}
+else if(type==='cap'){o.type='sawtooth';o.frequency.setValueAtTime(280,n);o.frequency.exponentialRampToValueAtTime(130,n+0.22);g.gain.setValueAtTime(0.25,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.25);o.start(n);o.stop(n+0.25);}
+else if(type==='chk'){o.type='square';o.frequency.setValueAtTime(880,n);o.frequency.setValueAtTime(1100,n+0.1);o.frequency.setValueAtTime(880,n+0.2);g.gain.setValueAtTime(0.18,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.35);o.start(n);o.stop(n+0.35);}
+else if(type==='win'){[523,659,784,1047].forEach((f,i)=>o.frequency.setValueAtTime(f,n+i*0.15));g.gain.setValueAtTime(0.25,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.8);o.start(n);o.stop(n+0.8);}
+else if(type==='ach'){o.type='sine';[784,988,1174].forEach((f,i)=>o.frequency.setValueAtTime(f,n+i*0.12));g.gain.setValueAtTime(0.18,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.5);o.start(n);o.stop(n+0.5);}
+else if(type==='bad'){o.type='square';o.frequency.setValueAtTime(180,n);g.gain.setValueAtTime(0.1,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.1);o.start(n);o.stop(n+0.1);}
+else if(type==='menuNav'){o.type='sine';o.frequency.setValueAtTime(520,n);o.frequency.exponentialRampToValueAtTime(680,n+0.08);g.gain.setValueAtTime(0.12,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.12);o.start(n);o.stop(n+0.12);}
+else if(type==='menuBack'){o.type='sine';o.frequency.setValueAtTime(680,n);o.frequency.exponentialRampToValueAtTime(440,n+0.1);g.gain.setValueAtTime(0.1,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.12);o.start(n);o.stop(n+0.12);}
+else if(type==='menuStart'){o.type='sine';[440,550,660].forEach((f,i)=>o.frequency.setValueAtTime(f,n+i*0.07));g.gain.setValueAtTime(0.18,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.3);o.start(n);o.stop(n+0.3);}
+}catch(e){}
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+const S = { sound:true, hints:true, coords:true, aiLevel:2 };
+
+// ============================================================
+// ACHIEVEMENTS
+// ============================================================
+const ACH = [
+{id:'first_win', ico:'🏆', fa:'اولین پیروزی', en:'First Victory', ar:'أول انتصار', dFa:'اولین بازی رو ببر', dEn:'Win your first game', dAr:'افز باللعبة الأولى', max:1},
+{id:'win5', ico:'🥇', fa:'پنج پیروزی', en:'Five Wins', ar:'خمس انتصارات', dFa:'۵ بازی برنده شو', dEn:'Win 5 games', dAr:'اربح 5 ألعاب', max:5},
+{id:'win10', ico:'👑', fa:'ده پیروزی', en:'Ten Wins', ar:'عشر انتصارات', dFa:'۱۰ بازی برنده شو', dEn:'Win 10 games', dAr:'اربح 10 ألعاب', max:10},
+{id:'win25', ico:'🎖️', fa:'بیست و پنج', en:'25 Wins', ar:'٢٥ انتصاراً', dFa:'۲۵ بازی برنده شو', dEn:'Win 25 games', dAr:'اربح 25 لعبة', max:25},
+{id:'ai_beat', ico:'🤖', fa:'شکست AI', en:'AI Slayer', ar:'قاتل الذكاء', dFa:'هوش مصنوعی رو مات کن', dEn:'Checkmate the AI', dAr:'اربح ضد الذكاء', max:1},
+{id:'ai_hard', ico:'💀', fa:'کابوس', en:'Nightmare', ar:'كابوس', dFa:'در سطح سخت AI رو مات کن', dEn:'Beat AI on Hard', dAr:'اهزم الذكاء الصعب', max:1},
+{id:'moves50', ico:'🧠', fa:'استراتژیست', en:'Strategist', ar:'استراتيجي', dFa:'بازی با ۵۰+ حرکت', dEn:'Play 50+ moves game', dAr:'العب 50+ حركة', max:50},
+{id:'moves100', ico:'📜', fa:'گرندماستر', en:'Grandmaster', ar:'عظيم ماستر', dFa:'بازی با ۱۰۰+ حرکت', dEn:'Play 100+ moves game', dAr:'العب 100+ حركة', max:100},
+{id:'cap10', ico:'⚔️', fa:'شکارچی', en:'Hunter', ar:'صياد', dFa:'در یک بازی ۱۰ مهره بزن', dEn:'Capture 10 in one game', dAr:'التقط 10 قطع', max:10},
+{id:'cap20', ico:'🗡️', fa:'فاتح', en:'Conqueror', ar:'فاتح', dFa:'در یک بازی ۲۰ مهره بزن', dEn:'Capture 20 in one game', dAr:'التقط 20 قطعة', max:20},
+{id:'undo10', ico:'↩️', fa:'استاد تاکتیک', en:'Tactician', ar:'تكتيكي', dFa:'۱۰ بار حرکت برگردون', dEn:'Use undo 10 times', dAr:'تراجع 10 مرات', max:10},
+{id:'check5', ico:'⚡', fa:'کیش‌باز', en:'Check King', ar:'ملك الكش', dFa:'۵ بار کیش بده', dEn:'Give check 5 times', dAr:'أعطِ الكش 5 مرات', max:5},
+{id:'skin_change',ico:'🎨', fa:'طراح', en:'Designer', ar:'مصمم', dFa:'یک اسکین عوض کن', dEn:'Change a skin', dAr:'غيّر سمة', max:1},
+{id:'ar_lang', ico:'🌍', fa:'چندزبانه', en:'Multilingual', ar:'متعدد اللغات', dFa:'زبان عربی رو انتخاب کن', dEn:'Switch to Arabic', dAr:'اختر العربية', max:1},
+{id:'queen_promo',ico:'♛', fa:'ارتقاء شاهانه', en:'Royal Promotion', ar:'ترقية ملكية', dFa:'پیاده رو به وزیر ارتقا بده', dEn:'Promote a pawn to queen', dAr:'رقِّ بيدقاً لملكة', max:1},
+{id:'play10', ico:'🎮', fa:'گیمر', en:'Gamer', ar:'لاعب', dFa:'۱۰ بازی انجام بده', dEn:'Play 10 games', dAr:'العب 10 ألعاب', max:10},
+{id:'play50', ico:'🕹️', fa:'حرفه‌ای', en:'Pro Gamer', ar:'لاعب محترف', dFa:'۵۰ بازی انجام بده', dEn:'Play 50 games', dAr:'العب 50 لعبة', max:50},
+{id:'win_friend', ico:'🤝', fa:'رقیب دوستانه', en:'Friendly Rival', ar:'منافس ودّي', dFa:'در حالت دو نفره برنده شو', dEn:'Win in 2-player mode', dAr:'اربح في وضع اللاعبين', max:1},
+{id:'castle', ico:'🏰', fa:'قلعه‌رو', en:'Castler', ar:'مُحصّن', dFa:'قلعه برو', dEn:'Perform a castling move', dAr:'قم بالتحصين', max:1},
+{id:'en_passant', ico:'⚡', fa:'آنپاسان', en:'En Passant', ar:'عبور', dFa:'حرکت آنپاسان انجام بده', dEn:'Perform en passant', dAr:'قم بالمرور', max:1},
+{id:'no_undo', ico:'🎯', fa:'بدون خطا', en:'No Mistakes', ar:'بلا أخطاء', dFa:'بدون بازگشت حرکت برنده شو', dEn:'Win without using undo', dAr:'اربح بدون تراجع', max:1},
+{id:'quick_win', ico:'⚡', fa:'پیروزی سریع', en:'Speed Win', ar:'انتصار سريع', dFa:'در کمتر از ۱۵ حرکت برنده شو',dEn:'Win in under 15 moves', dAr:'اربح في أقل من 15', max:1},
+{id:'skin_all', ico:'🎨', fa:'کلکتور', en:'Collector', ar:'جامع', dFa:'همه اسکین‌ها رو امتحان کن', dEn:'Try all piece skins', dAr:'جرب كل السمات', max:12},
+{id:'board_all', ico:'🌈', fa:'هنرمند', en:'Artist', ar:'فنان', dFa:'همه تم‌های صفحه رو امتحان کن',dEn:'Try all board themes', dAr:'جرب كل الألواح', max:13},
+{id:'comeback', ico:'🔄', fa:'بازگشت بزرگ', en:'Comeback', ar:'عودة', dFa:'وقتی کیش هستی برنده شو', dEn:'Win while in check', dAr:'اربح وأنت في كش', max:1},
+];
+
+let AP = {};
+try { AP = JSON.parse(localStorage.getItem('cr_ach') || '{}'); } catch(e) {}
+function saveAP() { try { localStorage.setItem('cr_ach', JSON.stringify(AP)); } catch(e) {} }
+
+function unlockAch(id, amt=1) {
+const def = ACH.find(a => a.id === id); if (!def) return;
+const prev = AP[id] || 0;
+const nv = Math.min(prev + amt, def.max);
+if (nv === prev) return;
+AP[id] = nv; saveAP();
+if (nv >= def.max && prev < def.max) showAchToast(def);
+if (document.getElementById('achScreen').classList.contains('active')) renderAchGrid();
+}
+
+function showAchToast(def) {
+snd('ach');
+document.getElementById('atIcon').textContent = def.ico;
+document.getElementById('atLbl').textContent = t('achUnlock');
+document.getElementById('atName').textContent = def[lang] || def.fa;
+document.getElementById('atDesc').textContent = def['d'+lang.charAt(0).toUpperCase()+lang.slice(1)] || def.dFa;
+const toast = document.getElementById('achToast');
+toast.classList.add('show');
+setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function renderAchGrid() {
+const grid = document.getElementById('achGrid');
+grid.innerHTML = '';
+ACH.forEach(def => {
+const prog = AP[def.id] || 0;
+const done = prog >= def.max;
+const card = document.createElement('div');
+card.className = 'ach-card ' + (done ? 'done' : 'locked');
+const name = def[lang] || def.fa;
+const desc = def['d'+lang.charAt(0).toUpperCase()+lang.slice(1)] || def.dFa;
+card.innerHTML = `${done ? '<div class="ach-badge">✓</div>' : ''}
+<div class="ach-ico">${def.ico}</div>
+<div class="ach-nm">${name}</div>
+<div class="ach-ds">${desc}</div>
+${def.max > 1 ? `<div class="ach-prog"><div class="ach-prog-fill" style="width:${Math.min(prog/def.max*100,100)}%"></div></div>` : ''}`;
+grid.appendChild(card);
+});
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showScreen(id) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if (id === 'skinsScreen') renderSkinGrid();
+if (id === 'achScreen') renderAchGrid();
+}
+function closeMo(id) { document.getElementById(id).classList.remove('active'); }
+function showConfirm(ico, title, txt, yesLbl, onYes) {
+document.getElementById('cfIco').textContent = ico;
+document.getElementById('cfTitle').textContent = title;
+document.getElementById('cfTxt').textContent = txt;
+const y = document.getElementById('cfYes');
+y.textContent = yesLbl;
+y.onclick = () => { closeMo('confirmMo'); onYes(); };
+document.getElementById('confirmMo').classList.add('active');
+}
+
+// ============================================================
+// CHESS ENGINE
+// ============================================================
+const FILES = ['a','b','c','d','e','f','g','h'];
+const RANKS = ['8','7','6','5','4','3','2','1'];
+const VALS = {P:100,N:320,B:330,R:500,Q:900,K:20000};
+const PST = {
+P:[[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],
+N:[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],
+};
+
+function initBoard() {
+return [
+['bR','bN','bB','bQ','bK','bB','bN','bR'],
+['bP','bP','bP','bP','bP','bP','bP','bP'],
+[null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null],
+['wP','wP','wP','wP','wP','wP','wP','wP'],
+['wR','wN','wB','wQ','wK','wB','wN','wR'],
+];
+}
+
+function col(p){return p?p[0]:null;}
+function typ(p){return p?p[1]:null;}
+function opp(c){return c==='w'?'b':'w';}
+function inB(r,c){return r>=0&&r<8&&c>=0&&c<8;}
+
+function rawMoves(board,r,c,ep){
+const p=board[r][c];if(!p)return[];
+const cl=col(p),t=typ(p),mv=[];
+if(t==='P'){
+const d=cl==='w'?-1:1,sr=cl==='w'?6:1;
+if(inB(r+d,c)&&!board[r+d][c]){mv.push([r+d,c]);if(r===sr&&!board[r+2*d][c])mv.push([r+2*d,c]);}
+[-1,1].forEach(dc=>{
+if(!inB(r+d,c+dc))return;
+if(board[r+d][c+dc]&&col(board[r+d][c+dc])!==cl)mv.push([r+d,c+dc]);
+if(ep&&ep[0]===r+d&&ep[1]===c+dc)mv.push([r+d,c+dc,'ep']);
+});
+}else if(t==='N'){
+[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc])=>{
+const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&col(board[nr][nc])!==cl)mv.push([nr,nc]);
+});
+}else if(t==='K'){
+[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc])=>{
+const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&col(board[nr][nc])!==cl)mv.push([nr,nc]);
+});
+}else{
+const dirs={R:[[0,1],[0,-1],[1,0],[-1,0]],B:[[1,1],[1,-1],[-1,1],[-1,-1]],Q:[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]]};
+(dirs[t]||[]).forEach(([dr,dc])=>{
+let nr=r+dr,nc=c+dc;
+while(inB(nr,nc)){if(col(board[nr][nc])===cl)break;mv.push([nr,nc]);if(board[nr][nc])break;nr+=dr;nc+=dc;}
+});
+}
+return mv;
+}
+
+function findKing(board,cl){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(board[r][c]===cl+'K')return [r,c];return null;}
+function isAtt(board,r,c,byCl){for(let br=0;br<8;br++)for(let bc=0;bc<8;bc++)if(col(board[br][bc])===byCl&&rawMoves(board,br,bc,null).some(m=>m[0]===r&&m[1]===c))return true;return false;}
+function inChk(board,cl){const k=findKing(board,cl);return k?isAtt(board,k[0],k[1],opp(cl)):false;}
+
+function applyMv(board,fr,fc,tr,tc,flag,promo){
+const nb=board.map(r=>[...r]);const p=nb[fr][fc];let cap=nb[tr][tc];
+nb[tr][tc]=promo?col(p)+promo:p;nb[fr][fc]=null;
+if(flag==='ep'){nb[fr][tc]=null;cap=col(p)==='w'?'bP':'wP';}
+if(typ(p)==='K'){if(tc===6){nb[tr][5]=nb[tr][7];nb[tr][7]=null;}if(tc===2){nb[tr][3]=nb[tr][0];nb[tr][0]=null;}}
+return{board:nb,cap};
+}
+
+function legalMvs(g,r,c){
+const p=g.board[r][c];if(!p||col(p)!==g.turn)return[];
+const raw=rawMoves(g.board,r,c,g.ep);const mv=[...raw];
+if(typ(p)==='K'&&!inChk(g.board,g.turn)){
+const row=g.turn==='w'?7:0;
+if(r===row&&c===4){
+if(g.cr[g.turn+'K']&&!g.board[row][5]&&!g.board[row][6]&&!isAtt(g.board,row,5,opp(g.turn))&&!isAtt(g.board,row,6,opp(g.turn)))mv.push([row,6,'castle']);
+if(g.cr[g.turn+'Ra']&&!g.board[row][3]&&!g.board[row][2]&&!g.board[row][1]&&!isAtt(g.board,row,3,opp(g.turn))&&!isAtt(g.board,row,2,opp(g.turn)))mv.push([row,2,'castle']);
+}
+}
+return mv.filter(([tr,tc,flag])=>{const{board:nb}=applyMv(g.board,r,c,tr,tc,flag);return!inChk(nb,g.turn);});
+}
+
+function allLegal(g){const all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(col(g.board[r][c])===g.turn)legalMvs(g,r,c).forEach(m=>all.push({from:[r,c],to:m}));return all;}
+
+function execMv(g,fr,fc,tr,tc,flag,promo){
+const piece=g.board[fr][fc];const{board:nb,cap}=applyMv(g.board,fr,fc,tr,tc,flag,promo);
+if(cap){(g.turn==='w'?g.capW:g.capB).push(cap);g.capCount=(g.capCount||0)+1;}
+if(typ(piece)==='K'){g.cr[g.turn+'K']=false;g.cr[g.turn+'Ra']=false;}
+if((fr===7&&fc===0)||(tr===7&&tc===0))g.cr['wRa']=false;
+if((fr===7&&fc===7)||(tr===7&&tc===7))g.cr['wK']=false;
+if((fr===0&&fc===0)||(tr===0&&tc===0))g.cr['bRa']=false;
+if((fr===0&&fc===7)||(tr===0&&tc===7))g.cr['bK']=false;
+g.ep=(typ(piece)==='P'&&Math.abs(tr-fr)===2)?[(fr+tr)/2,tc]:null;
+g.hist.push({board:g.board.map(r=>[...r]),from:[fr,fc],to:[tr,tc],cap,piece,turn:g.turn,cr:{...g.cr},ep:g.ep,capW:[...g.capW],capB:[...g.capB]});
+g.board=nb;g.lF=[fr,fc];g.lT=[tr,tc];g.turn=opp(g.turn);if(g.turn==='w')g.fullMv++;
+g.mc=(g.mc||0)+1;
+const am=allLegal(g);const ic=inChk(g.board,g.turn);
+if(ic)g.chkCount=(g.chkCount||0)+1;
+g.status=am.length===0?(ic?'checkmate':'stalemate'):(ic?'check':'playing');
+return{cap,ic,status:g.status};
+}
+
+function evalBoard(board){let s=0;for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=board[r][c];if(!p)continue;const cl=col(p),t=typ(p);const v=VALS[t]||0;const pos=PST[t]?(cl==='w'?PST[t][7-r][c]:PST[t][r][7-c]):0;s+=cl==='w'?(v+pos):-(v+pos);}return s;}
+
+function minimax(g,depth,alpha,beta,max){
+if(depth===0||g.status==='checkmate'||g.status==='stalemate'){
+if(g.status==='checkmate')return max?-99999:99999;
+if(g.status==='stalemate')return 0;
+return evalBoard(g.board);
+}
+const moves=allLegal(g);
+function save(){return{board:g.board.map(r=>[...r]),turn:g.turn,ep:g.ep,cr:{...g.cr},status:g.status,capW:[...g.capW],capB:[...g.capB],hist:[...g.hist],lF:g.lF,lT:g.lT,mc:g.mc,capCount:g.capCount,chkCount:g.chkCount};}
+function restore(sv){Object.assign(g,sv);g.hist=[...sv.hist];g.capW=[...sv.capW];g.capB=[...sv.capB];}
+if(max){let best=-Infinity;for(const{from:[fr,fc],to:[tr,tc,flag]}of moves){const sv=save();execMv(g,fr,fc,tr,tc,flag);const v=minimax(g,depth-1,alpha,beta,false);restore(sv);best=Math.max(best,v);alpha=Math.max(alpha,v);if(beta<=alpha)break;}return best;}
+else{let best=Infinity;for(const{from:[fr,fc],to:[tr,tc,flag]}of moves){const sv=save();execMv(g,fr,fc,tr,tc,flag);const v=minimax(g,depth-1,alpha,beta,true);restore(sv);best=Math.min(best,v);beta=Math.min(beta,v);if(beta<=alpha)break;}return best;}
+}
+
+function getAiMv(g){
+const moves=allLegal(g);if(!moves.length)return null;
+moves.sort(()=>Math.random()-0.5);
+let best=-Infinity,bm=null;
+function save(){return{board:g.board.map(r=>[...r]),turn:g.turn,ep:g.ep,cr:{...g.cr},status:g.status,capW:[...g.capW],capB:[...g.capB],hist:[...g.hist],lF:g.lF,lT:g.lT,mc:g.mc,capCount:g.capCount,chkCount:g.chkCount};}
+function restore(sv){Object.assign(g,sv);g.hist=[...sv.hist];g.capW=[...sv.capW];g.capB=[...sv.capB];}
+for(const{from:[fr,fc],to:[tr,tc,flag]}of moves){
+const sv=save();execMv(g,fr,fc,tr,tc,flag);
+const v=minimax(g,S.aiLevel-1,-Infinity,Infinity,true);
+restore(sv);if(-v>best){best=-v;bm={from:[fr,fc],to:[tr,tc,flag]};}
+}
+return bm;
+}
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = null;
+let gamesPlayed = parseInt(localStorage.getItem('cr_gp')||'0');
+
+function createGame(mode){
+return{board:initBoard(),turn:'w',mode,selected:null,validMvs:[],hist:[],capW:[],capB:[],
+cr:{wK:true,wRa:true,bK:true,bRa:true},ep:null,fullMv:1,
+status:'playing',lF:null,lT:null,promoPending:null,aiThink:false,
+mc:0,capCount:0,chkCount:0};
+}
+
+// ============================================================
+// GET PIECE GLYPH (skin aware)
+// ============================================================
+const PIECE_ORDER = {P:0,R:1,N:2,B:3,Q:4,K:5};
+function getGlyph(piece) {
+if(!piece) return '';
+const cl=col(piece), t=typ(piece), idx=PIECE_ORDER[t];
+const sk = currentSkin;
+const glyph = cl==='w' ? sk.w[idx] : sk.b[idx];
+const style = cl==='w' ? (sk.wStyle||'') : (sk.bStyle||'');
+return { glyph, style };
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderBoard(){
+const el=document.getElementById('chessBoard');
+el.innerHTML='';
+const sqSz=Math.min(window.innerWidth*0.115,64);
+el.style.width=(sqSz*8)+'px';el.style.height=(sqSz*8)+'px';
+
+for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+const sq=document.createElement('div');
+sq.className='sq '+((r+c)%2===0?'light':'dark');
+sq.style.width=sqSz+'px';sq.style.height=sqSz+'px';
+
+if(S.coords){
+if(c===7){const s=document.createElement('span');s.className='coord f';s.textContent=FILES[c];sq.appendChild(s);}
+if(r===7){const s=document.createElement('span');s.className='coord r';s.textContent=RANKS[r];sq.appendChild(s);}
+}
+if(G.lF&&G.lF[0]===r&&G.lF[1]===c)sq.classList.add('lf');
+if(G.lT&&G.lT[0]===r&&G.lT[1]===c)sq.classList.add('lt');
+if(G.selected&&G.selected[0]===r&&G.selected[1]===c)sq.classList.add('selected');
+if((G.status==='check'||G.status==='checkmate')){const k=findKing(G.board,G.turn);if(k&&k[0]===r&&k[1]===c)sq.classList.add('ic');}
+if(S.hints&&G.validMvs){const vm=G.validMvs.find(m=>m[0]===r&&m[1]===c);if(vm)sq.classList.add(G.board[r][c]?'vc':'vm');}
+
+const p=G.board[r][c];
+if(p){
+const sp=document.createElement('span');
+sp.className='piece';
+const g=getGlyph(p);
+if(typeof g==='object'){
+sp.textContent=g.glyph;
+sp.style.cssText+=g.style;
+sp.style.fontSize=(sqSz*0.72)+'px';
+}else{
+sp.textContent=g;
+sp.style.fontSize=(sqSz*0.72)+'px';
+}
+sq.appendChild(sp);
+}
+sq.addEventListener('click',()=>handleClick(r,c));
+el.appendChild(sq);
+}
+updateGameUI();
+}
+
+function updateGameUI(){
+document.getElementById('whiteP').classList.toggle('active',G.turn==='w');
+document.getElementById('blackP').classList.toggle('active',G.turn==='b');
+const wl=t('white'), bl=t('black');
+document.getElementById('whiteColorLabel').textContent=wl;
+document.getElementById('blackColorLabel').textContent=bl;
+
+const turnPre=G.status==='check'?t('check'):t('turn');
+const who=G.turn==='w'?wl:bl;
+const statusTxt={playing:turnPre+who,check:turnPre+who,checkmate:t('checkmate'),stalemate:t('stalemate')};
+document.getElementById('turnBadge').textContent=statusTxt[G.status]||'';
+
+// Captured
+const capGlyphs=(arr)=>arr.map(p=>{const g=getGlyph(p);return '<span style="font-size:1rem">'+(typeof g==='object'?`<span style="${g.style}">${g.glyph}</span>`:g)+'</span>';}).join('');
+document.getElementById('capW').innerHTML=capGlyphs(G.capW);
+document.getElementById('capB').innerHTML=capGlyphs(G.capB);
+
+// History
+const ml=document.getElementById('mvList');ml.innerHTML='';
+G.hist.forEach(h=>{const tag=document.createElement('span');tag.className='mv-tag '+(h.turn==='w'?'w':'b');tag.textContent=FILES[h.to[1]]+RANKS[h.to[0]];ml.appendChild(tag);});
+ml.scrollLeft=ml.scrollWidth;
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+function handleClick(r,c){
+if(['checkmate','stalemate'].includes(G.status)||G.aiThink||G.promoPending)return;
+if(G.mode==='ai'&&G.turn==='b')return;
+const p=G.board[r][c];
+if(G.selected&&G.validMvs.some(m=>m[0]===r&&m[1]===c)){
+const mv=G.validMvs.find(m=>m[0]===r&&m[1]===c);
+const[fr,fc]=G.selected;const piece=G.board[fr][fc];
+if(typ(piece)==='P'&&(r===0||r===7)){G.promoPending={fr,fc,tr:r,tc:c,flag:mv[2]};showPromo(col(piece));return;}
+doMove(fr,fc,r,c,mv[2]);return;
+}
+if(p&&col(p)===G.turn){G.selected=[r,c];G.validMvs=legalMvs(G,r,c);}
+else{snd('bad');G.selected=null;G.validMvs=[];}
+renderBoard();
+}
+
+function doMove(fr,fc,tr,tc,flag,promo){
+const res=execMv(G,fr,fc,tr,tc,flag,promo);
+G.selected=null;G.validMvs=[];
+if(res.cap)snd('cap');else snd('move');
+if(res.ic||G.status==='checkmate')snd('chk');
+if(flag==='castle') unlockAch('castle');
+if(flag==='ep') unlockAch('en_passant');
+renderBoard();
+checkAchs();
+if(['checkmate','stalemate'].includes(G.status)){setTimeout(()=>showGameOver(),600);return;}
+if(G.mode==='ai'&&G.turn==='b'){
+G.aiThink=true;
+document.getElementById('turnBadge').textContent=t('turn')+'🤖';
+setTimeout(()=>{
+const am=getAiMv(G);
+if(am){
+const{from:[afr,afc],to:[atr,atc,aflag]}=am;
+const ap=G.board[afr][afc];
+const pr=(typ(ap)==='P'&&(atr===0||atr===7))?'Q':undefined;
+const ar=execMv(G,afr,afc,atr,atc,aflag,pr);
+if(ar.cap)snd('cap');else snd('move');
+if(ar.ic||G.status==='checkmate')snd('chk');
+}
+G.aiThink=false;renderBoard();checkAchs();
+if(['checkmate','stalemate'].includes(G.status))setTimeout(()=>showGameOver(),600);
+},350);
+}
+}
+
+function checkAchs(){
+if(G.mc>=50)unlockAch('moves50',G.mc);
+if(G.mc>=100)unlockAch('moves100',G.mc);
+if(G.capCount)unlockAch('cap10',G.capCount);
+if(G.capCount>=20)unlockAch('cap20',G.capCount);
+if(G.chkCount)unlockAch('check5',G.chkCount);
+if(G.status==='checkmate'&&G.mc<30)unlockAch('quick_win');
+if(G.status==='checkmate'&&G.wasInCheck)unlockAch('comeback');
+if(G.status==='check') G.wasInCheck=true;
+}
+
+function showPromo(cl){
+const row=document.getElementById('promoRow');row.innerHTML='';
+['Q','R','B','N'].forEach(tp=>{
+const btn=document.createElement('button');btn.className='promo-btn';
+const g=getGlyph(cl+tp);
+if(typeof g==='object'){const sp=document.createElement('span');sp.style.cssText=g.style;sp.style.fontSize='2.2rem';sp.textContent=g.glyph;btn.appendChild(sp);}
+else{btn.textContent=g;btn.style.fontSize='2.2rem';}
+btn.onclick=()=>{
+closeMo('promoMo');const{fr,fc,tr,tc,flag}=G.promoPending;G.promoPending=null;
+unlockAch('queen_promo');doMove(fr,fc,tr,tc,flag,tp);
+};
+row.appendChild(btn);
+});
+document.getElementById('promoMo').classList.add('active');
+}
+
+function showGameOver(){
+const isCM=G.status==='checkmate';
+if(isCM){
+const winner=opp(G.turn);
+const wname=winner==='w'?document.getElementById('whiteName').textContent:document.getElementById('blackName').textContent;
+document.getElementById('goIco').textContent='🏆';
+document.getElementById('goTitle').textContent=t('checkmate');
+document.getElementById('goTxt').textContent=wname+t('winsMsg');
+snd('win');
+unlockAch('first_win');unlockAch('win5');unlockAch('win10');unlockAch('win25');
+unlockAch('play10',1);unlockAch('play50',1);
+if(G.mode==='friend') unlockAch('win_friend');
+if(G.mode==='ai'){unlockAch('ai_beat');if(S.aiLevel===3)unlockAch('ai_hard');}
+if(!G.usedUndo) unlockAch('no_undo');
+}else{
+document.getElementById('goIco').textContent='🤝';
+document.getElementById('goTitle').textContent=t('stalemate');
+document.getElementById('goTxt').textContent=t('draws');
+}
+document.getElementById('gameOverMo').classList.add('active');
+document.querySelectorAll('.mdbtn[data-fa]').forEach(b=>b.textContent=b.dataset[lang]||b.dataset.fa);
+}
+
+// ============================================================
+// GAME CONTROLS
+// ============================================================
+function startGame(mode){
+G=createGame(mode);
+gamesPlayed++;localStorage.setItem('cr_gp',gamesPlayed);
+unlockAch('play10',1);
+document.getElementById('whiteName').textContent=mode==='ai'?{fa:'شما',en:'You',ar:'أنت'}[lang]:{fa:'بازیکن ۱',en:'Player 1',ar:'لاعب ١'}[lang];
+document.getElementById('blackName').textContent=mode==='ai'?'🤖 AI':{fa:'بازیکن ۲',en:'Player 2',ar:'لاعب ٢'}[lang];
+const wg=getGlyph('wK'),bg=getGlyph('bK');
+document.getElementById('whiteAvatar').textContent=typeof wg==='object'?wg.glyph:wg;
+document.getElementById('blackAvatar').textContent=typeof bg==='object'?bg.glyph:bg;
+showScreen('gameScreen');renderBoard();
+}
+
+function restartGame(){closeMo('gameOverMo');startGame(G.mode);}
+function goToMenu(){closeMo('gameOverMo');G=null;showScreen('menuScreen');}
+function newGameConfirm(){showConfirm('🔄',{fa:'بازی جدید',en:'New Game',ar:'لعبة جديدة'}[lang],{fa:'شروع بازی جدید؟',en:'Start new game?',ar:'بدء لعبة جديدة؟'}[lang],{fa:'بله',en:'Yes',ar:'نعم'}[lang],()=>restartGame());}
+function confirmExit(){showConfirm('🚪',{fa:'خروج',en:'Exit',ar:'خروج'}[lang],{fa:'از بازی خارج شوید؟',en:'Exit to menu?',ar:'العودة للقائمة؟'}[lang],{fa:'بله',en:'Yes',ar:'نعم'}[lang],()=>goToMenu());}
+
+function undoMove(){
+if(!G.hist.length){snd('bad');return;}
+const count=G.mode==='ai'&&G.hist.length>=2?2:1;
+for(let i=0;i<count;i++){
+if(!G.hist.length)break;
+const h=G.hist.pop();
+G.board=h.board;G.turn=h.turn;G.capW=h.capW;G.capB=h.capB;
+G.cr=h.cr;G.ep=h.ep;G.status='playing';
+G.lF=G.hist.length?G.hist[G.hist.length-1].from:null;
+G.lT=G.hist.length?G.hist[G.hist.length-1].to:null;
+}
+G.selected=null;G.validMvs=[];
+G.usedUndo=true;
+unlockAch('undo10',1);snd('move');renderBoard();
+}
+
+function offerDraw(){
+if(G.mode==='ai'){const sc=evalBoard(G.board);if(Math.abs(sc)<300){G.status='stalemate';document.getElementById('goIco').textContent='🤝';document.getElementById('goTitle').textContent=t('stalemate');document.getElementById('goTxt').textContent=t('draws');document.getElementById('gameOverMo').classList.add('active');}else alert({fa:'AI تساوی رو رد کرد!',en:'AI rejected the draw!',ar:'رفض الذكاء التعادل!'}[lang]);return;}
+showConfirm('🤝',{fa:'تساوی',en:'Draw',ar:'تعادل'}[lang],{fa:'تساوی قبول می‌کنید؟',en:'Accept draw?',ar:'قبول التعادل؟'}[lang],{fa:'قبول',en:'Accept',ar:'قبول'}[lang],()=>{G.status='stalemate';document.getElementById('goIco').textContent='🤝';document.getElementById('goTitle').textContent=t('stalemate');document.getElementById('goTxt').textContent=t('draws');document.getElementById('gameOverMo').classList.add('active');});
+}
+
+function resignGame(){
+const cl=G.turn,nm=cl==='w'?document.getElementById('whiteName').textContent:document.getElementById('blackName').textContent;
+const wn=cl==='w'?document.getElementById('blackName').textContent:document.getElementById('whiteName').textContent;
+showConfirm('🏳️',{fa:'تسلیم',en:'Resign',ar:'استسلام'}[lang],{fa:'مطمئنی؟',en:'Are you sure?',ar:'هل أنت متأكد؟'}[lang],{fa:'بله',en:'Yes',ar:'نعم'}[lang],()=>{
+document.getElementById('goIco').textContent='🏆';
+document.getElementById('goTitle').textContent=nm+t('resigned');
+document.getElementById('goTxt').textContent=wn+t('winsMsg');
+document.getElementById('gameOverMo').classList.add('active');snd('win');
+document.querySelectorAll('.mdbtn[data-fa]').forEach(b=>b.textContent=b.dataset[lang]||b.dataset.fa);
+});
+}
+
+// ============================================================
+// MYKET INTENTS
+// ============================================================
+const PKG = 'com.midnightgames.chess';
+const DEV_ID = 'midnight_games';
+
+function myket(action) {
+let intentUrl = '';
+let fallbackUrl = '';
+
+switch(action) {
+case 'page':
+intentUrl = `intent://details?id=${PKG}#Intent;scheme=myket;package=ir.myket.bazaar;action=android.intent.action.VIEW;end`; fallbackUrl = `https://myket.ir/app/${PKG}`;
+break;
+case 'rate':
+intentUrl = `intent://details?id=${PKG}#Intent;scheme=myket;package=ir.myket.bazaar;action=android.intent.action.VIEW;S.market_referrer=utm_source%3Drate_button;end`; fallbackUrl = `https://myket.ir/app/${PKG}`;
+break;
+case 'developer':
+intentUrl = `intent://developer?id=${DEV_ID}#Intent;scheme=myket;package=ir.myket.bazaar;action=android.intent.action.VIEW;end`; fallbackUrl = `https://myket.ir/developer/${DEV_ID}`;
+break;
+case 'update':
+intentUrl = `intent://details?id=${PKG}#Intent;scheme=myket;package=ir.myket.bazaar;action=android.intent.action.VIEW;S.market_referrer=utm_source%3Dupdate_check;end`; fallbackUrl = `https://myket.ir/app/${PKG}`;
+break;
+case 'search':
+intentUrl = `intent://search?q=chess+royale#Intent;scheme=myket;package=ir.myket.bazaar;action=android.intent.action.VIEW;end`;
+fallbackUrl = `https://myket.ir/search?q=chess+royale`;
+break;
+}
+
+if (!intentUrl) return;
+
+if (/Android/i.test(navigator.userAgent)) {
+window.location.href = intentUrl;
+setTimeout(() => { window.open(fallbackUrl, '_blank'); }, 1800);
+} else {
+window.open(fallbackUrl, '_blank');
+}
+}
+
+// ============================================================
+// SPLASH SCREEN & INIT
+// ============================================================
+window.addEventListener('load', () => {
+const fill = document.getElementById('splashFill');
+let pct = 0;
+const interval = setInterval(() => {
+pct += Math.random() * 18 + 8;
+if (pct >= 100) { pct = 100; clearInterval(interval); }
+fill.style.width = pct + '%';
+if (pct >= 100) {
+setTimeout(() => {
+document.getElementById('splash').classList.add('hidden');
+setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 650);
+}, 300);
+}
+}, 120);
+
+document.documentElement.style.setProperty('--lsq', currentBoard.l);
+document.documentElement.style.setProperty('--dsq', currentBoard.d);
+
+if(localStorage.getItem('cr_secret_unlocked') === 'true') {
+secretUnlocked = true;
+if(!SKINS.find(s => s.id === 'midnight')) SKINS.push(SECRET_SKIN);
+if(!BOARD_THEMES.find(b => b.id === 'midnight_theme')) BOARD_THEMES.push(SECRET_BOARD);
+}
+});
+
+window.addEventListener('resize', () => { if (G) renderBoard(); });
+</script>
+</body>
+                        </html>
